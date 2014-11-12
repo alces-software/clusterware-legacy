@@ -29,6 +29,7 @@
 ################################################################################
 action=$1
 shift
+us=`basename $0`
 
 case $action in
     install|instal|insta|inst|ins|in|i)
@@ -45,26 +46,16 @@ case $action in
 		echo ""
 		exit 1
 	    fi
-	elif [ "$package" = "--remote" ]; then
-	    package=$1
-	    shift
+	else
 	    alces_REMOTE_FACILITY="$1"
 	    shift
 	    if [ -z "$alces_REMOTE_FACILITY" ]; then
-		echo "Usage: $alces_BINNAME $us install --remote <name> <git URL>"
+		echo "Usage: $alces_BINNAME $us install <name> <git URL>"
 		echo "Invalid remote facility path specified."
 		echo ""
 		exit 1
 	    fi
 	fi
-	if [ -z "$package" ]; then
-	    us=`basename $0`
-	    echo "Usage: $alces_BINNAME $us install <name>"
-	    echo "No facility name specified."
-	    echo ""
-	    exit 1
-	fi
-	HOST=download.alces-software.com
 
 	alces_PATH="$(cd $alces_COREBASE/.. && pwd)"
 	alces_SRC_PATH="$alces_PATH/var/cache/clusterware/src"
@@ -81,15 +72,6 @@ case $action in
 [0m
 EOF
 
-	if [ -z "$alces_LOCAL_FACILITY" -a -z "$alces_REMOTE_FACILITY" ]; then
-  	    curl -f -# http://${HOST}/clusterware/${package}.tar.gz -o "${alces_ARCHIVES_PATH}/${package}.tar.gz"
-	fi
-
-	if [ $? -gt 0 ]; then
-	    echo "Unable to download package '${package}', aborting."
-	    exit 1
-	fi
-
 	if [ "$alces_LOCAL_FACILITY" ]; then
 	    cp -r "$alces_LOCAL_FACILITY" "${alces_SRC_PATH}/${package}"
 	    cd "$alces_SRC_PATH/${package}"
@@ -103,23 +85,13 @@ EOF
 	elif [ "$alces_REMOTE_FACILITY" ]; then
 	    git clone "$alces_REMOTE_FACILITY" "${alces_SRC_PATH}/${package}"
 	    cd "$alces_SRC_PATH/${package}"
-	    if [ -f "archives/files.txt" ]; then
-		cd archives
-		cat files.txt | (while read x; do
-		    curl -f -# http://${HOST}/clusterware/archives/$x -o $x
-		    done)
-		cd ..
+	    if [ -f "scripts/fetch_archives.sh" ]; then
+		sh scripts/fetch_archives.sh
 	    fi
 	    if [ ! -f "$alces_SRC_PATH/${package}/scripts/install" ]; then
 		echo "Unable to perform remote installation of '${package}'; can't find $alces_SRC_PATH/${package}/scripts/install, aborting."
 		exit 1
 	    fi
-	else
-	    [[ -d "${alces_SRC_PATH}/${package}" ]] || mkdir -p "${alces_SRC_PATH}/${package}"
-	    
-	    cd "$alces_SRC_PATH/${package}"
-	    
-	    tar xzf "$alces_ARCHIVES_PATH/${package}.tar.gz"
 	fi
 
 	cat <<EOF
