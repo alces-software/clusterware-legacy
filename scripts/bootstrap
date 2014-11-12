@@ -1,0 +1,76 @@
+#!/bin/bash
+
+NAME=symphony
+SOURCE=$1
+
+if [[ -z "${alces_PATH:-}" ]]; then
+  if (( UID == 0 )); then
+    alces_PATH="/var/lib/alces/nodeware/"
+  else
+    alces_PATH="${HOME}/.alces"
+  fi
+fi
+
+alces_SRC_PATH="$alces_PATH/var/cache/symphony/src"
+alces_ARCHIVES_PATH="$alces_PATH/var/cache/symphony/archives"
+export alces_PATH alces_SRC_PATH alces_ARCHIVES_PATH
+
+for dir in "$alces_SRC_PATH" "$alces_ARCHIVES_PATH"; do
+  if [[ ! -d "$dir" ]]; then
+    mkdir -p "$dir"
+  fi
+done
+
+# 0. Install dependencies
+cat <<EOF
+^[[33m
+===============================================================================
+ INSTALLING DEPENDENCIES
+===============================================================================
+^[[0m
+EOF
+
+
+yum -e0 -y  install ncurses-devel libevent-devel sqlite-devel libpcap-devel flex
+
+# 1. download tarball
+
+cat <<EOF
+[33m
+===============================================================================
+ DOWNLOADING SOURCE
+===============================================================================
+[0m
+EOF
+
+if [ -z $SOURCE ]; then
+
+  curl -f -k -# http://download.alces-software.com/symphony/${NAME}.tar.gz -o "${alces_ARCHIVES_PATH}/${NAME}.tar.gz"
+
+  if [ $? -gt 0 ]; then
+    echo "Unable to download package '${package}', aborting."
+    exit 1
+  fi
+  SOURCE="${alces_ARCHIVES_PATH}/${NAME}.tar.gz"
+else
+
+  echo "Skipping.."
+fi
+
+SOURCE=`readlink -f $SOURCE`
+
+[[ -d "${alces_SRC_PATH}/${NAME}" ]] || mkdir -p "${alces_SRC_PATH}/${NAME}"
+
+cd $alces_SRC_PATH/${NAME}
+tar xzf $SOURCE
+
+cat <<EOF
+[33m
+===============================================================================
+ BOOTSTRAPPING INSTALLER
+===============================================================================
+[0m
+EOF
+
+chmod +x ./scripts/install
+./scripts/install

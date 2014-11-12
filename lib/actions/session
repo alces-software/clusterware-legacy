@@ -1,0 +1,116 @@
+: '
+: NAME: session
+: SYNOPSIS: Background command execution management
+: VERSION: 1.0.0
+: '
+################################################################################
+# (c) Copyright 2007-2012 Alces Software Ltd & Stephen F Norledge.             #
+#                                                                              #
+# Symphony - Operating System Content Deployment Framework                     #
+#                                                                              #
+# This file/package is part of Symphony                                        #
+#                                                                              #
+# Symphony is free software: you can redistribute it and/or modify it under    #
+# the terms of the GNU Affero General Public License as published by the Free  #
+# Software Foundation, either version 3 of the License, or (at your option)    #
+# any later version.                                                           #
+#                                                                              #
+# Symphony is distributed in the hope that it will be useful, but WITHOUT      #
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        #
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License #
+# for more details.                                                            #
+#                                                                              #
+# You should have received a copy of the GNU Affero General Public License     #
+# along with Symphony.  If not, see <http://www.gnu.org/licenses/>.            #
+#                                                                              #
+# For more information on the Symphony Toolkit, please visit:                  #
+# http://www.alces-software.org/symphony                                       #
+#                                                                              #
+################################################################################
+action=$1
+shift
+
+tmux=$(which tmux 2> /dev/null)
+if [[ -z "${tmux}" ]]; then
+  tmux="${alces_COREBASE}/tmux/1.6/bin/tmux"
+fi
+
+case $action in
+    attach|attac|atta|att|at|a)
+	session=$1
+	shift
+	
+	if "${tmux}" has-session -t 'alces' 2>/dev/null; then
+	    if [ "$session" ]; then
+		window=$("${tmux}" list-windows -F '#{window_index}: #{window_name}' | egrep "\[$session\]|^$session:" | cut -f1 -d':')
+		if [ -z "$window" ]; then
+		    echo "No task found '$session'. Did you mean one of the following?"
+		    echo ""
+		    "${tmux}" list-windows -F '#{window_index}: #{window_name}'
+		else
+		    "${tmux}" select-window -t $window
+		    "${tmux}" attach-session -r -t 'alces'
+		fi
+	    else
+		"${tmux}" attach-session -r -t 'alces'
+	    fi
+	else
+	    echo "No active tasks."
+	fi
+	;;
+    kill|kil|ki|k|rm)
+	session=$1
+	shift
+	
+	if "${tmux}" has-session -t 'alces' 2>/dev/null; then
+	    if [ "$session" ]; then
+		window=$("${tmux}" list-windows -F '#{window_index}: #{window_name}' | egrep "\[$session\]|^$session:" | cut -f1 -d':')
+		if [ -z "$window" ]; then
+		    echo "No task found '$session'. Did you mean one of the following?"
+		    echo ""
+		    "${tmux}" list-windows -F '#{window_index}: #{window_name}'
+		else
+		    # XXX - are you sure?
+		    "${tmux}" kill-window -t $window
+		    echo "Task terminated."
+		fi
+	    else
+		echo 'Usage: kill <task index|task identifier>'
+		echo "No task index or task identifer specified. Did you mean one of the following?"
+		echo ""
+		"${tmux}" list-windows -F '#{window_index}: #{window_name}'
+	    fi
+	else
+	    echo "No active tasks."
+	fi
+	;;
+    list|lis|li|l|ls)
+	if "${tmux}" has-session -t 'alces' 2>/dev/null; then
+	    "${tmux}" list-windows -F '#{window_index}: #{window_name}'
+	else
+	    echo "No active tasks."
+	fi	
+	;;
+    spawn|spaw|spa|sp|s|new)
+	# force rainbow colors within tmux sessions
+	export CLICOLOR_FORCE=1
+	alces_LOG=~/.alces/var/spool/tasks/$$.out
+	cmd="alces_LOG=$alces_LOG $alces_BIN "
+	for a in "$@"; do
+	    cmd="$cmd\"$a\" "
+	done
+	if "${tmux}" has-session -t 'alces' 2>/dev/null; then
+	    "${tmux}" new-window -d -t 'alces' -n "$* [$$]" "$cmd ; if [ \$? -gt 0 ]; then res='[31mFAIL[0m'; else res='[32mCOMPLETE[0m'; fi; $alces_BIN message queue '[$$]' == \$res == '$*' ; sleep 60"
+	else
+	    "${tmux}" -f ~/.alces/etc/tmux.conf new-session -d -s 'alces' -n "$* [$$]" "$cmd; if [ \$? -gt 0 ]; then res='[31mFAIL[0m'; else res='[32mCOMPLETE[0m'; fi; $alces_BIN message queue '[$$]' == \$res == '$*'; sleep 60"
+	fi
+	echo "Spawned task: $$"
+	;;
+    help|hel|he|h|--help|-h|'')
+        display_help $0
+	;;
+    *)
+	us=`basename $0`
+	echo "$alces_BINNAME $us: '$action' is not a known command. See '$alces_BINNAME $us --help'."
+	;;
+esac

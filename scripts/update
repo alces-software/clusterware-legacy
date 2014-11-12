@@ -1,0 +1,94 @@
+#!/bin/bash
+
+NAME=symphony
+
+# ensure all children die when we do
+trap "/bin/kill -- -$BASHPID &>/dev/null" EXIT INT TERM
+
+function toggle_spin () {
+	if [ -z "$spin_pid" ]; then
+	    (
+		i=1
+		sp="/-\|"
+		printf " "
+		while true;
+		do
+		    printf "\b[1m${sp:i++%${#sp}:1}[0m"
+		    if [[ i -eq ${#sp} ]]; then
+			i=0
+		    fi
+		    sleep 0.2
+		done
+	    ) &
+	    sleep 1
+	    spin_pid=$!
+	else
+	    sleep 1
+	    kill $spin_pid
+	    wait $spin_pid 2>/dev/null
+	    printf "\b"
+	    unset spin_pid
+	fi
+}
+
+function title() {
+    printf "\n > $1\n"
+}
+
+function doing() {
+    if [ -z "$2" ]; then
+	pad=12
+    else
+	pad=$2
+    fi
+    printf "    [36m%${pad}s[0m ... " "$1"
+    toggle_spin
+}
+
+function say_done () {
+    toggle_spin
+    if [ $1 -gt 0 ]; then
+	echo '[31mFAIL[0m'
+	exit 1
+    else
+	echo '[32mOK[0m '
+    fi
+}
+
+cat <<EOF
+[33m===============================================================================
+ STARTING UPDATE
+===============================================================================[0m
+EOF
+
+LOGDIR="var/log/symphony"
+
+title "Updating actions and binaries"
+doing "Update"
+cp -r "${alces_SRC_PATH}/${NAME}/bin"/* "${alces_PATH}/opt/${NAME}/bin"
+cp -r "${alces_SRC_PATH}/${NAME}/lib/actions"/* "${alces_PATH}/opt/${NAME}/lib/actions"
+say_done $?
+
+# Create initial configuration files
+title "Updating configuration"
+doing "Update"
+if (( UID == 0 )); then
+    cp -r "${alces_SRC_PATH}/${NAME}/etc/global"/* "${alces_PATH}/etc"
+    cp -r "${alces_SRC_PATH}/${NAME}/etc/system"/* "${alces_PATH}/etc"
+else
+    cp -r "${alces_SRC_PATH}/${NAME}/etc/global"/* "${alces_PATH}/etc"
+    cp -r "${alces_SRC_PATH}/${NAME}/etc/user"/* "${alces_PATH}/etc"
+fi
+say_done $?
+
+# different branch for root (system-wide) install
+if (( UID == 0 )); then
+    if [ -d ${alces_PATH}/etc/profile.d ]; then
+	# we've discovered an alces stack most likely!
+	TARGET=${alces_PATH}/etc/profile.d
+    else
+	TARGET=/etc/profile.d
+    fi
+    mv "${alces_PATH}/etc/alces-symphony.sh" $TARGET/alces-symphony.sh
+    mv "${alces_PATH}/etc/alces-symphony.csh" $TARGET/alces-symphony.csh
+fi
