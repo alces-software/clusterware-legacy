@@ -20,7 +20,7 @@
 # along with Symphony.  If not, see <http://www.gnu.org/licenses/>.            #
 #                                                                              #
 # For more information on the Symphony Toolkit, please visit:                  #
-# http://www.alces-software.org/symphony                                       #
+# https://github.com/alces-software/symphony                                       #
 #                                                                              #
 ################################################################################
 function usage {
@@ -105,7 +105,7 @@ realname="${realname:-$alces_BINNAME}"
 export alces_BASE="$(cd `dirname $realname`/.. && pwd)"
 export alces_CMDDIR="$alces_BASE/lib/actions"
 export alces_COREBASE="$(cd $alces_BASE/.. && pwd)"
-export alces_SUITENAME=symphony
+export alces_SUITENAME=clusterware
 if [ -t 2 ]; then
     export alces_TTY=${alces_TTY:-1}
     export alces_COLOUR=${alces_COLOUR:-1}

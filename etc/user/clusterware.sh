@@ -4,9 +4,9 @@
 ## Copyright (c) 2008-2012 Alces Software Ltd
 ##
 ################################################################################
-setenv alces_PATH "$HOME/.alces"
-setenv alces_MODE user
+export alces_PATH="$HOME/.alces"
+export alces_MODE=user
 
-foreach i ( "${alces_PATH}/etc/symphony/plugins.d"/*.csh )
-    source $i
-end
+for a in "$alces_PATH/etc/clusterware/plugins.d"/*.sh; do
+  source $a
+done

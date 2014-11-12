@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME=symphony
+NAME=clusterware
 
 # ensure all children die when we do
 trap "/bin/kill -- -$BASHPID &>/dev/null" EXIT INT TERM
@@ -61,7 +61,7 @@ cat <<EOF
 ===============================================================================[0m
 EOF
 
-LOGDIR="var/log/symphony"
+LOGDIR="var/log/clusterware"
 
 title "Updating actions and binaries"
 doing "Update"
@@ -89,6 +89,6 @@ if (( UID == 0 )); then
     else
 	TARGET=/etc/profile.d
     fi
-    mv "${alces_PATH}/etc/alces-symphony.sh" $TARGET/alces-symphony.sh
-    mv "${alces_PATH}/etc/alces-symphony.csh" $TARGET/alces-symphony.csh
+    mv "${alces_PATH}/etc/alces-clusterware.sh" $TARGET/alces-clusterware.sh
+    mv "${alces_PATH}/etc/alces-clusterware.csh" $TARGET/alces-clusterware.csh
 fi

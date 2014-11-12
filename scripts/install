@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME=symphony
+NAME=clusterware
 
 alces_yaml_version=0.1.4
 alces_ruby_version=1.9.3-p484
@@ -73,7 +73,7 @@ doing 'Create'
 cp -r "${alces_SRC_PATH}/${NAME}/bin" "${alces_SRC_PATH}/${NAME}/lib" "${alces_PATH}/opt/${NAME}"
 
 # Make directories
-LOGDIR="var/log/symphony"
+LOGDIR="var/log/clusterware"
 for a in bin etc $LOGDIR var/spool var/spool/tasks; do
     [[ -d "${alces_PATH}/${a}" ]] || mkdir -p "${alces_PATH}/${a}"
 done
@@ -204,8 +204,8 @@ if (( UID == 0 )); then
     else
 	TARGET=/etc/profile.d
     fi
-    mv "${alces_PATH}/etc/alces-symphony.sh" $TARGET/alces-symphony.sh
-    mv "${alces_PATH}/etc/alces-symphony.csh" $TARGET/alces-symphony.csh
+    mv "${alces_PATH}/etc/alces-clusterware.sh" $TARGET/alces-clusterware.sh
+    mv "${alces_PATH}/etc/alces-clusterware.csh" $TARGET/alces-clusterware.csh
     cat <<EOF
 [33m
 ===============================================================================
@@ -214,12 +214,12 @@ if (( UID == 0 )); then
 [0m[1m
 Global profile scripts have been installed in:
 
-$TARGET/alces-symphony.sh
-$TARGET/alces-symphony.csh
+$TARGET/alces-clusterware.sh
+$TARGET/alces-clusterware.csh
 
 Please login again, or manually run the following:
 
-source $TARGET/alces-symphony.${rc_script_ext}
+source $TARGET/alces-clusterware.${rc_script_ext}
 
 Afterwards, execute 'alces' for further information.
 [0m
@@ -236,23 +236,23 @@ EOF
     cat <<EOF
 Please add the following to your shell startup file:
 
-[[ -s "\$HOME/.alces/etc/symphony.sh" ]] && . "\$HOME/.alces/etc/symphony.sh"
+[[ -s "\$HOME/.alces/etc/clusterware.sh" ]] && . "\$HOME/.alces/etc/clusterware.sh"
 
 Once added, please login again, or manually run the following:
 
-source "\$HOME/.alces/etc/symphony.sh"
+source "\$HOME/.alces/etc/clusterware.sh"
 EOF
     else
     cat <<EOF
 Please add the following to your shell startup file:
 
-if ( -f "\$HOME/.alces/etc/symphony.csh" ) then
-  source "\$HOME/.alces/etc/symphony.csh"
+if ( -f "\$HOME/.alces/etc/clusterware.csh" ) then
+  source "\$HOME/.alces/etc/clusterware.csh"
 endif
 
 Once added, please login again, or manually run the following:
 
-source "\$HOME/.alces/etc/symphony.csh"
+source "\$HOME/.alces/etc/clusterware.csh"
 EOF
     fi
 cat <<EOF

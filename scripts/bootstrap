@@ -1,18 +1,18 @@
 #!/bin/bash
 
-NAME=symphony
+NAME=clusterware
 SOURCE=$1
 
 if [[ -z "${alces_PATH:-}" ]]; then
   if (( UID == 0 )); then
-    alces_PATH="/var/lib/alces/nodeware/"
+    alces_PATH="/opt/clusterware/"
   else
     alces_PATH="${HOME}/.alces"
   fi
 fi
 
-alces_SRC_PATH="$alces_PATH/var/cache/symphony/src"
-alces_ARCHIVES_PATH="$alces_PATH/var/cache/symphony/archives"
+alces_SRC_PATH="$alces_PATH/var/cache/$NAME/src"
+alces_ARCHIVES_PATH="$alces_PATH/var/cache/$NAME/archives"
 export alces_PATH alces_SRC_PATH alces_ARCHIVES_PATH
 
 for dir in "$alces_SRC_PATH" "$alces_ARCHIVES_PATH"; do
@@ -31,7 +31,7 @@ cat <<EOF
 EOF
 
 
-yum -e0 -y  install ncurses-devel libevent-devel sqlite-devel libpcap-devel flex
+yum -e0 -y  install ncurses-devel libevent-devel sqlite-devel libpcap-devel flex git
 
 # 1. download tarball
 
@@ -43,26 +43,12 @@ cat <<EOF
 [0m
 EOF
 
-if [ -z $SOURCE ]; then
+git clone https://github.com/alces-software/clusterware.git "${alces_ARCHIVES_PATH}/${NAME}"
 
-  curl -f -k -# http://download.alces-software.com/symphony/${NAME}.tar.gz -o "${alces_ARCHIVES_PATH}/${NAME}.tar.gz"
-
-  if [ $? -gt 0 ]; then
-    echo "Unable to download package '${package}', aborting."
-    exit 1
-  fi
-  SOURCE="${alces_ARCHIVES_PATH}/${NAME}.tar.gz"
-else
-
-  echo "Skipping.."
+if [ $? -gt 0 ]; then
+  echo "Unable to clone source, aborting."
+  exit 1
 fi
-
-SOURCE=`readlink -f $SOURCE`
-
-[[ -d "${alces_SRC_PATH}/${NAME}" ]] || mkdir -p "${alces_SRC_PATH}/${NAME}"
-
-cd $alces_SRC_PATH/${NAME}
-tar xzf $SOURCE
 
 cat <<EOF
 [33m
@@ -72,5 +58,8 @@ cat <<EOF
 [0m
 EOF
 
+cd "${alces_ARCHIVES_PATH}/${NAME}"
+chmod +x ./scripts/fetch_archives.sh
+./scripts/fetch_archives.sh
 chmod +x ./scripts/install
 ./scripts/install

@@ -63,7 +63,7 @@ if [ "$BASH_VERSION" ]; then
 
         COMPREPLY=()
 
-	cmds=$(ls $alces_PATH/opt/symphony/lib/actions)
+	cmds=$(ls $alces_PATH/opt/clusterware/lib/actions)
         #cmds="attach config help hub message module packager session"
 
         if ((COMP_CWORD == 1)); then
