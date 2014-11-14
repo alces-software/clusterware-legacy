@@ -1,5 +1,5 @@
-clusterware
-===========
+Alces Clusterware
+=================
 
 Alces Software Ltd HPC Clusterware facility
 
@@ -28,7 +28,6 @@ curl -L "https://raw.githubusercontent.com/alces-software/clusterware/master/scr
 bash -l
 alces facility install stack https://github.com/alces-software/clusterware-stack
 ```
-
  - HPC Packager
 ```
 #reload your shell
