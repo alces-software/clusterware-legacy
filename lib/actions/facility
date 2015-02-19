@@ -60,6 +60,7 @@ case $action in
 	alces_PATH="$(cd $alces_COREBASE/.. && pwd)"
 	alces_SRC_PATH="$alces_PATH/var/cache/clusterware/src"
 	alces_ARCHIVES_PATH="$alces_PATH/var/cache/clusterware/archives"
+        mkdir -p "$alces_SRC_PATH" "$alces_ARCHIVES_PATH"
 	export alces_PATH alces_SRC_PATH alces_ARCHIVES_PATH
 
         # 1. download package tarball
