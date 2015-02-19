@@ -1,7 +1,7 @@
 ################################################################################
 ##
 ## Alces HPC Software Stack - Symphony shell configuration
-## Copyright (c) 2008-2012 Alces Software Ltd
+## Copyright (c) 2008-2015 Alces Software Ltd
 ##
 ################################################################################
 alces() { 
@@ -29,6 +29,8 @@ alces() {
 		*)
 		    if [[ ":$alces_FLAGS:" =~ :nopager: ]]; then
 			eval $($alces_PATH/bin/alces "$@") 2>&1
+                    elif [ -n "$POSIXLY_CORRECT" ]; then
+                        eval $($alces_PATH/bin/alces "$@") 2>&1
 		    else
 			eval $($alces_PATH/bin/alces "$@" 2> >(less -FRX >&2)) 2>&1
 		    fi
