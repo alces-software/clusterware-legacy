@@ -1,12 +1,18 @@
 ################################################################################
 ##
 ## Alces HPC Software Stack - Symphony shell configuration
-## Copyright (c) 2008-2012 Alces Software Ltd
+## Copyright (c) 2008-2015 Alces Software Ltd
 ##
 ################################################################################
 setenv alces_PATH /opt/clusterware/
 setenv alces_MODE system
 
-foreach i ( "${alces_PATH}/etc/clusterware/plugins.d"/*.csh )
-    source $i
-end
+if ( -d "${alces_PATH}/etc/clusterware/plugins.d" ) then
+    set nonomatch
+    foreach i ( "${alces_PATH}/etc/clusterware/plugins.d"/*.csh )
+      if ( -r "$i" ) then
+         source "$i"
+      endif
+    end
+    unset i nonomatch
+endif
