@@ -1,7 +1,11 @@
 #!/bin/bash
 
 NAME=clusterware
-SOURCE=$1
+BRANCH=$1
+
+if [ -z "${BRANCH}" ]; then
+  BRANCH=master
+fi
 
 if [[ -z "${alces_PATH:-}" ]]; then
   if (( UID == 0 )); then
@@ -42,7 +46,7 @@ cat <<EOF
 [0m
 EOF
 
-git clone https://github.com/alces-software/clusterware.git "${alces_SRC_PATH}/${NAME}"
+git clone https://github.com/alces-software/clusterware.git "${alces_SRC_PATH}/${NAME}" -b $BRANCH
 
 if [ $? -gt 0 ]; then
   echo "Unable to clone source, aborting."
