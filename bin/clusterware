@@ -117,11 +117,11 @@ if [[ ":$alces_FLAGS:" =~ :nocolou?r: || "$TERM" == "linux" ]]; then
     export alces_COLOUR=0
 fi
 ### RUBY
-export alces_RUBY="$alces_COREBASE/ruby/1.9.3-p484/bin/ruby"
-export alces_RUBYHOME="$alces_COREBASE/ruby/1.9.3-p484"
-export LD_LIBRARY_PATH="$alces_COREBASE/ruby/1.9.3-p484/lib:$LD_LIBRARY_PATH"
-export GEM_HOME="$alces_COREBASE/ruby/1.9.3-p484/lib/ruby/gems/1.9.1"
-export GEM_PATH="$alces_COREBASE/ruby/1.9.3-p484/lib/ruby/gems/1.9.1"
+export alces_RUBY="$alces_COREBASE/${alces_OS}/ruby/1.9.3-p484/bin/ruby"
+export alces_RUBYHOME="$alces_COREBASE/${alces_OS}/ruby/1.9.3-p484"
+export LD_LIBRARY_PATH="$alces_COREBASE/${alces_OS}/ruby/1.9.3-p484/lib:$LD_LIBRARY_PATH"
+export GEM_HOME="$alces_COREBASE/${alces_OS}/ruby/1.9.3-p484/lib/ruby/gems/1.9.1"
+export GEM_PATH="$alces_COREBASE/${alces_OS}/ruby/1.9.3-p484/lib/ruby/gems/1.9.1"
 
 cmd=$1
 
