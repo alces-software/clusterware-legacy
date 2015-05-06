@@ -107,7 +107,7 @@ else
     say_done $?
     cd yaml-${alces_yaml_version}
     doing 'Configure'
-    ./configure --prefix="${alces_PATH}/opt/lib" &> "${alces_PATH}/${LOGDIR}/libyaml-configure.log"
+    ./configure --prefix="${alces_PATH}/opt/${alces_OS}/lib" &> "${alces_PATH}/${LOGDIR}/libyaml-configure.log"
     say_done $?
     doing 'Compile'
     make &> "${alces_PATH}/${LOGDIR}/libyaml-make.log"
@@ -123,7 +123,7 @@ else
     say_done $?
     cd ruby-${alces_ruby_version}
     doing 'Configure'
-    ./configure --prefix="${alces_PATH}/opt/ruby/${alces_ruby_version}" --enable-shared --disable-install-doc --with-libyaml --with-opt-dir="${alces_PATH}/opt/lib" &> "${alces_PATH}/${LOGDIR}/ruby-configure.log"
+    ./configure --prefix="${alces_PATH}/opt/${alces_OS}/ruby/${alces_ruby_version}" --enable-shared --disable-install-doc --with-libyaml --with-opt-dir="${alces_PATH}/opt/${alces_OS}/lib" &> "${alces_PATH}/${LOGDIR}/ruby-configure.log"
     say_done $?
     doing 'Compile'
     make &> "${alces_PATH}/${LOGDIR}/ruby-make.log"
@@ -135,7 +135,7 @@ else
     # install bundler gem
     title "Installing ruby bundler"
     doing 'Install'
-    "${alces_PATH}/opt/ruby/${alces_ruby_version}/bin/gem" install --local "${alces_ARCHIVES_PATH}/bundler-${alces_bundler_version}.gem" &> "${alces_PATH}/${LOGDIR}/bundler-install.log"
+    "${alces_PATH}/opt/${alces_OS}/ruby/${alces_ruby_version}/bin/gem" install --local "${alces_ARCHIVES_PATH}/bundler-${alces_bundler_version}.gem" &> "${alces_PATH}/${LOGDIR}/bundler-install.log"
     say_done $?
 
     title "Installing tmux"
@@ -145,7 +145,7 @@ else
     say_done $?
     cd tmux-${alces_tmux_version}
     doing 'Configure'
-    ./configure --prefix="${alces_PATH}/opt/tmux/${alces_tmux_version}" &> "${alces_PATH}/${LOGDIR}/tmux-configure.log"
+    ./configure --prefix="${alces_PATH}/opt/${alces_OS}/tmux/${alces_tmux_version}" &> "${alces_PATH}/${LOGDIR}/tmux-configure.log"
     say_done $?
     doing 'Compile'
     make &> "${alces_PATH}/${LOGDIR}/tmux-make.log"
@@ -162,10 +162,10 @@ else
 	say_done $?
 	cd git-git-*
 	doing 'Compile'
-	make prefix="${alces_PATH}/opt/git/${alces_git_version}" all &> "${alces_PATH}/${LOGDIR}/git-make.log"
+	make prefix="${alces_PATH}/opt/${alces_OS}/git/${alces_git_version}" all &> "${alces_PATH}/${LOGDIR}/git-make.log"
 	say_done $?
 	doing 'Install'
-	make prefix="${alces_PATH}/opt/git/${alces_git_version}" install &> "${alces_PATH}/${LOGDIR}/git-install.log"
+	make prefix="${alces_PATH}/opt/${alces_OS}/git/${alces_git_version}" install &> "${alces_PATH}/${LOGDIR}/git-install.log"
     else
 	doing 'Detect'
     fi
