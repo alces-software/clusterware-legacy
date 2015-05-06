@@ -6,6 +6,7 @@
 ################################################################################
 export alces_PATH=/opt/clusterware/
 export alces_MODE=system
+export alces_OS=el7
 
 if [ -d "${alces_PATH}/etc/clusterware/plugins.d" ]; then
     for a in "$alces_PATH/etc/clusterware/plugins.d"/*.sh; do
