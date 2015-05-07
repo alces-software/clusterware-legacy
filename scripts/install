@@ -92,11 +92,7 @@ fi
 say_done $?
 
 #install deps tree
-if [ -z $alces_SKIP_BUILD_DEPS ]; then 
-  /bin/bash ${alces_SRC_PATH}/${NAME}/scripts/build
-else
-  /bin/bash alces_SKIP_BUILD_DEPS=$alces_SKIP_BUILD_DEPS ${alces_SRC_PATH}/${NAME}/scripts/build
-fi
+/bin/bash ${alces_SRC_PATH}/${NAME}/scripts/build $alces_BUILD_DEPS
 
 title "Activating 'alces' command"
 doing 'Create'

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if ! [ -z "$1" ]; then
-  alces_OS=$1
+  alces_deps=$1
 fi
 
 NAME=clusterware
@@ -71,11 +71,12 @@ cat <<EOF
 ===============================================================================[0m
 EOF
 
-if [ "${alces_SKIP_BUILD_DEPS}" ]; then
-    title "Copying in existing deps tree from ~/alces-deps-${alces_OS}"
+if [ "${alces_deps}" ]; then
+    title "Copying in existing deps tree from ${alces_deps}"
     doing "Copy"
-    if [ -d ~/alces-deps-${alces_OS} ]; then
-      cp -a ~/alces-deps-${alces_OS}/* "${alces_PATH}/opt/${alces_OS}/."
+    if [ -d ${alces_deps} ]; then
+      mkdir -p "${alces_PATH}/opt/${alces_OS}/"
+      cp -a ${alces_deps}/* "${alces_PATH}/opt/${alces_OS}/."
       say_done $?
     else
       say_done 1
