@@ -1,0 +1,157 @@
+#!/bin/bash
+
+if ! [ -z "$1" ]; then
+  alces_OS=$1
+fi
+
+NAME=clusterware
+
+alces_yaml_version=0.1.4
+alces_ruby_version=1.9.3-p484
+alces_git_version=1.7.11.1
+alces_tmux_version=1.6
+alces_bundler_version=1.1.4
+
+# ensure all children die when we do
+trap "/bin/kill -- -$BASHPID &>/dev/null" EXIT INT TERM
+
+function toggle_spin () {
+	if [ -z "$spin_pid" ]; then
+	    (
+		i=1
+		sp="/-\|"
+		printf " "
+		while true;
+		do
+		    printf "\b[1m${sp:i++%${#sp}:1}[0m"
+		    if [[ i -eq ${#sp} ]]; then
+			i=0
+		    fi
+		    sleep 0.2
+		done
+	    ) &
+	    sleep 1
+	    spin_pid=$!
+	else
+	    sleep 1
+	    kill $spin_pid
+	    wait $spin_pid 2>/dev/null
+	    printf "\b"
+	    unset spin_pid
+	fi
+}
+
+function title() {
+    printf "\n > $1\n"
+}
+
+function doing() {
+    if [ -z "$2" ]; then
+	pad=12
+    else
+	pad=$2
+    fi
+    printf "    [36m%${pad}s[0m ... " "$1"
+    toggle_spin
+}
+
+function say_done () {
+    toggle_spin
+    if [ $1 -gt 0 ]; then
+	echo '[31mFAIL[0m'
+	exit 1
+    else
+	echo '[32mOK[0m '
+    fi
+}
+
+cat <<EOF
+[33m===============================================================================
+ STARTING DEPENDENCY COMPILATION
+===============================================================================[0m
+EOF
+
+if [ "${alces_SKIP_BUILD_DEPS}" ]; then
+    title "Copying in existing deps tree from ~/alces-deps-${alces_OS}"
+    dooing "Copy"
+    if [ -d ~/alces-deps-${alces_OS} ]; then
+      cp -a ~/alces-deps-${alces_OS}/* "${alces_PATH}/opt/${alces_OS}/."
+      say_done $?
+    else
+      say_done 1
+    fi
+else
+    # Compile and install third party utilities
+    cp "${alces_SRC_PATH}/${NAME}/archives"/* "${alces_ARCHIVES_PATH}"
+
+    title "Installing libyaml"
+    cd "${alces_SRC_PATH}"
+    doing 'Extract'
+    tar xzf "${alces_ARCHIVES_PATH}/yaml-${alces_yaml_version}.tar.gz"
+    say_done $?
+    cd yaml-${alces_yaml_version}
+    doing 'Configure'
+    ./configure --prefix="${alces_PATH}/opt/${alces_OS}/lib" &> "${alces_PATH}/${LOGDIR}/libyaml-configure-${alces_OS}.log"
+    say_done $?
+    doing 'Compile'
+    make &> "${alces_PATH}/${LOGDIR}/libyaml-make-${alces_OS}.log"
+    say_done $?
+    doing 'Install'
+    make install &> "${alces_PATH}/${LOGDIR}/libyaml-install-${alces_OS}.log"
+    say_done $?
+
+    title "Installing ruby"
+    cd "${alces_SRC_PATH}"
+    doing 'Extract'
+    tar xzf "${alces_ARCHIVES_PATH}/ruby-${alces_ruby_version}.tar.gz"
+    say_done $?
+    cd ruby-${alces_ruby_version}
+    doing 'Configure'
+    ./configure --prefix="${alces_PATH}/opt/${alces_OS}/ruby/${alces_ruby_version}" --enable-shared --disable-install-doc --with-libyaml --with-opt-dir="${alces_PATH}/opt/${alces_OS}/lib" &> "${alces_PATH}/${LOGDIR}/ruby-configure-${alces_OS}.log"
+    say_done $?
+    doing 'Compile'
+    make &> "${alces_PATH}/${LOGDIR}/ruby-make-${alces_OS}.log"
+    say_done $?
+    doing 'Install'
+    make install &> "${alces_PATH}/${LOGDIR}/ruby-install-${alces_OS}.log"
+    say_done $?
+
+    # install bundler gem
+    title "Installing ruby bundler"
+    doing 'Install'
+    "${alces_PATH}/opt/${alces_OS}/ruby/${alces_ruby_version}/bin/gem" install --local "${alces_ARCHIVES_PATH}/bundler-${alces_bundler_version}.gem" &> "${alces_PATH}/${LOGDIR}/bundler-install-${alces_OS}.log"
+    say_done $?
+
+    title "Installing tmux"
+    cd "${alces_SRC_PATH}"
+    doing 'Extract'
+    tar xzf "${alces_ARCHIVES_PATH}/tmux-${alces_tmux_version}.tar.gz"
+    say_done $?
+    cd tmux-${alces_tmux_version}
+    doing 'Configure'
+    ./configure --prefix="${alces_PATH}/opt/${alces_OS}/tmux/${alces_tmux_version}" &> "${alces_PATH}/${LOGDIR}/tmux-configure-${alces_OS}.log"
+    say_done $?
+    doing 'Compile'
+    make &> "${alces_PATH}/${LOGDIR}/tmux-make-${alces_OS}.log"
+    say_done $?
+    doing 'Install'
+    make install &> "${alces_PATH}/${LOGDIR}/tmux-install-${alces_OS}.log"
+    say_done $?
+
+    title "Installing git"
+    if ! which git &>/dev/null; then
+	cd "${alces_SRC_PATH}"
+	doing 'Extract'
+	tar xzf "${alces_ARCHIVES_PATH}/git-${alces_git_version}.tar.gz"
+	say_done $?
+	cd git-git-*
+	doing 'Compile'
+	make prefix="${alces_PATH}/opt/${alces_OS}/git/${alces_git_version}" all &> "${alces_PATH}/${LOGDIR}/git-make-${alces_OS}.log"
+	say_done $?
+	doing 'Install'
+	make prefix="${alces_PATH}/opt/${alces_OS}/git/${alces_git_version}" install &> "${alces_PATH}/${LOGDIR}/git-install-${alces_OS}.log"
+    else
+	doing 'Detect'
+    fi
+    say_done $?
+fi
