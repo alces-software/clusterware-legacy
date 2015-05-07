@@ -73,7 +73,7 @@ EOF
 
 if [ "${alces_SKIP_BUILD_DEPS}" ]; then
     title "Copying in existing deps tree from ~/alces-deps-${alces_OS}"
-    dooing "Copy"
+    doing "Copy"
     if [ -d ~/alces-deps-${alces_OS} ]; then
       cp -a ~/alces-deps-${alces_OS}/* "${alces_PATH}/opt/${alces_OS}/."
       say_done $?
