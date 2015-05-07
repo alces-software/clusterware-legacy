@@ -125,8 +125,8 @@ if (( UID == 0 )); then
     else
 	TARGET=/etc/profile.d
     fi
-    mv "${alces_PATH}/etc/alces-clusterware.sh" $TARGET/alces-clusterware.sh
-    mv "${alces_PATH}/etc/alces-clusterware.csh" $TARGET/alces-clusterware.csh
+    sed -e "s|alces_OS.*$|alces_OS=${alces_OS}|g" "${alces_PATH}/etc/alces-clusterware.sh" > $TARGET/alces-clusterware.sh
+    sed -e "s|alces_OS.*$|alces_OS ${alces_OS}|g" "${alces_PATH}/etc/alces-clusterware.csh" > $TARGET/alces-clusterware.csh
     cat <<EOF
 [33m
 ===============================================================================
