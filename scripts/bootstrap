@@ -18,7 +18,7 @@ fi
 alces_SRC_PATH="$alces_PATH/var/cache/${NAME}/src"
 alces_ARCHIVES_PATH="$alces_PATH/var/cache/${NAME}/archives"
 
-if [ -z alces_OS ]; then 
+if [ -z $alces_OS ]; then 
   echo "Please set alces_OS" >&2
   exit 1
 fi
