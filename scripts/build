@@ -12,6 +12,8 @@ alces_git_version=1.7.11.1
 alces_tmux_version=1.6
 alces_bundler_version=1.1.4
 
+LOGDIR="var/log/clusterware"
+
 # ensure all children die when we do
 trap "/bin/kill -- -$BASHPID &>/dev/null" EXIT INT TERM
 
