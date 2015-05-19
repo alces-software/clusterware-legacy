@@ -41,7 +41,7 @@ cat <<EOF
 [0m
 EOF
 
-yum -e0 -y  install ncurses-devel libevent-devel sqlite-devel libpcap-devel flex git libgenders-devel lsof gcc
+yum -e0 -y  install ncurses-devel libevent-devel sqlite-devel libpcap-devel flex git libgenders-devel lsof gcc zlib zlib-devel
 
 # 1. download tarball
 
