@@ -104,7 +104,7 @@ realname="`readlink $0`"
 realname="${realname:-$alces_BINNAME}"
 export alces_BASE="$(cd `dirname $realname`/.. && pwd)"
 export alces_CMDDIR="$alces_BASE/lib/actions"
-export alces_COREBASE="$(cd $alces_BASE/.. && pwd)"
+export alces_COREBASE="$(cd $alces_BASE/.. && pwd)/${alces_OS}/"
 export alces_SUITENAME=clusterware
 if [ -t 2 ]; then
     export alces_TTY=${alces_TTY:-1}
